@@ -16,9 +16,9 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
   endif()
 endif()
 
-find_package(YARP REQUIRED COMPONENTS OS sig)
-find_package(ICUB REQUIRED)
 find_package(ICUBcontrib REQUIRED)
+find_package(YARP REQUIRED COMPONENTS OS sig cv)
+find_package(ICUB REQUIRED)
 find_package(OpenCV REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
@@ -31,6 +31,7 @@ icubcontrib_set_default_prefix()
 set(sources src/main.cpp)
 
 add_executable(${PROJECT_NAME} ${sources})
+target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
 target_link_libraries(${PROJECT_NAME} ${YARP_LIBRARIES} ${OpenCV_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
