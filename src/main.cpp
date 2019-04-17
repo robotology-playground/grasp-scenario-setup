@@ -14,6 +14,7 @@
 
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
+#include <yarp/cv/Cv.h>
 
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -25,10 +26,14 @@ class GraspScenarioSetupModule : public RFModule
 {
     std::string moduleName;
 
-    BufferedPort<ImageOf<PixelRgba> > inputPort;
-    BufferedPort<ImageOf<PixelRgba> > outputPort;
+    BufferedPort<ImageOf<PixelRgb> > inputPort;
+    BufferedPort<ImageOf<PixelRgb> > outputPort;
 
-    ImageOf<PixelRgba> refImage;
+    // Reference image loaded at start-up
+    ImageOf<PixelRgb> refImage;
+    // OpenCV Mat of the reference image rescaled to fit the input stream
+    // its size can change at run time, but it should mostly be constant
+    cv::Mat refImageMat;
 
     bool configure(ResourceFinder &rf) override
     {
@@ -60,13 +65,41 @@ class GraspScenarioSetupModule : public RFModule
     /****************************************************************/
     bool updateModule() override
     {
-        return false;
+        if((inputPort.getInputCount() < 1) || (outputPort.getOutputCount() < 1))
+        {
+            yarp::os::Time::delay(0.1);
+            return true;
+        }
+
+        ImageOf<PixelRgb> *inIm = inputPort.read();
+        cv::Mat inMat = yarp::cv::toCvMat(*inIm);
+        cv::Size imSize = inMat.size();
+
+        // Rescale reference image Mat to adapt to input stream if necessary
+        if(imSize!=refImageMat.size())
+        {
+            ImageOf<PixelRgb> imTmp;
+            imTmp.copy(refImage);
+            cv::Mat matTmp = yarp::cv::toCvMat(imTmp);
+            cv::resize(matTmp, refImageMat, imSize);
+        }
+
+        cv::Mat mixIn[2] = {inMat, refImageMat};
+        cv::Mat outMat(imSize, CV_8UC3, cvScalar(255,0,0));
+        int from_to[] = {0,0, 1,1, 5,2};
+        cv::mixChannels( mixIn, 2, &outMat, 1, from_to, 3);
+
+        ImageOf<PixelRgb> &outImage = outputPort.prepare();
+        outImage.copy(yarp::cv::fromCvMat<PixelRgb>(outMat));
+        outputPort.write();
+
+        return true;
     }
 
     /****************************************************************/
     double getPeriod() override
     {
-        return 1.0;
+        return 0.0;
     }
 
     /****************************************************************/
