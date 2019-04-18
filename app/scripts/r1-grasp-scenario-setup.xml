@@ -5,7 +5,7 @@ The robot should be started and the camera should be streaming.
     </description>
 
     <dependencies>
-        <port>/cer/depthCamera/rgbImage:o</port>
+        <port>/depthCamera/rgbImage:o</port>
     </dependencies>
 
 <!-- Modules -->
@@ -27,7 +27,7 @@ The robot should be started and the camera should be streaming.
     <!-- RGB image -->
 
     <connection>
-        <from>/cer/depthCamera/rgbImage:o</from>
+        <from>/depthCamera/rgbImage:o</from>
         <to>/grasp-scenario-setup/image:i</to>
         <protocol>tcp</protocol>
     </connection>
