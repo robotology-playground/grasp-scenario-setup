@@ -18,10 +18,8 @@ endif()
 
 find_package(ICUBcontrib REQUIRED)
 find_package(YARP REQUIRED COMPONENTS OS sig cv)
-find_package(ICUB REQUIRED)
 find_package(OpenCV REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
 
 include(ICUBcontribHelpers)
@@ -40,11 +38,11 @@ icubcontrib_add_uninstall_target()
 file(GLOB scripts ${CMAKE_SOURCE_DIR}/app/scripts/*.template)
 yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_TEMPLATES_INSTALL_DIR})
 
-file(GLOB ini app/conf/*.ini)
+file(GLOB ini ${CMAKE_SOURCE_DIR}/app/conf/*.ini)
 yarp_install(FILES ${ini} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${PROJECT_NAME})
 
-file(GLOB xml app/scripts/*.xml)
+file(GLOB xml ${CMAKE_SOURCE_DIR}/app/scripts/*.xml)
 yarp_install(FILES ${xml} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
 
-file(GLOB image data/*.ppm)
+file(GLOB image ${CMAKE_SOURCE_DIR}/data/*.ppm)
 yarp_install(FILES ${image} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${PROJECT_NAME})
