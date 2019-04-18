@@ -1,0 +1,41 @@
+<application>
+    <name>R1_grasp_scenario_setup</name>
+    <description> Script to setup a grasp scenario with R1.
+The robot should be started and the camera should be streaming.
+    </description>
+
+    <dependencies>
+        <port>/cer/depthCamera/rgbImage:o</port>
+    </dependencies>
+
+<!-- Modules -->
+
+    <module>
+        <name>grasp-scenario-setup</name>
+        <parameters>--file Ref_320x240_scenario1.ppm</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /grasp-scenario-setup-viewer/rgb:i -p 50 --compact</parameters>
+        <node>localhost</node>
+    </module>
+
+<!-- Connections -->
+
+    <!-- RGB image -->
+
+    <connection>
+        <from>/cer/depthCamera/rgbImage:o</from>
+        <to>/grasp-scenario-setup/image:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/grasp-scenario-setup/image:o</from>
+        <to>/grasp-scenario-setup-viewer/rgb:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>

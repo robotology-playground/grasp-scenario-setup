@@ -37,11 +37,20 @@ class GraspScenarioSetupModule : public RFModule
 
     bool configure(ResourceFinder &rf) override
     {
+        rf.setVerbose(rf.check("verbose"));
+
         moduleName = rf.check("name", Value("grasp-scenario-setup")).toString();
 
         std::string refFileName = rf.check("file", Value("")).toString();
+        if(refFileName == "")
+        {
+            yError() << "Missing parameter --file for reference image file" << refFileName;
+            return false;
+        }
 
-        if(!file::read(refImage, refFileName))
+        std::string refFilePath = rf.findFile(refFileName);
+
+        if(!file::read(refImage, refFilePath))
         {
             yError() << "Could not open reference image file" << refFileName;
             return false;
